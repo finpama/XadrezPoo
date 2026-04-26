@@ -5,12 +5,19 @@ import Xadrez.Pecas.*;
 public class Tabuleiro {
     private Peca[][] matrizPosicoes;
 
+    public Peca[][] getMatrizPosicoes() {
+        return matrizPosicoes;
+    }
+    public void setMatrizPosicoes() {
+        this.matrizPosicoes = new Peca[8][8]; // cria uma matriz 8x8 para guardar as posições
+    }
+
     public Tabuleiro() {
+        setMatrizPosicoes();
         setPecasIniciais();
     }
 
     private void setPecasIniciais() {
-        this.matrizPosicoes = new Peca[8][8]; // cria uma matriz 8x8 para guardar as posições
 
         //Peças Pretas
         this.matrizPosicoes[0][0] = new Torre(this, false);
@@ -88,6 +95,5 @@ public class Tabuleiro {
 
     }
 
-    public void moverPeca
 
 }

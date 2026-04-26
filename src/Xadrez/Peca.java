@@ -9,16 +9,33 @@ public abstract class Peca {
     protected boolean pecaBranca;
     protected String nome;
 
-    public Peca(Tabuleiro tabuleiro) {
+    public Peca(Tabuleiro tabuleiro, boolean pecaBranca) {
+        setTabuleiro(tabuleiro);
+        setPecaBranca(pecaBranca);
+    }
+
+    protected Tabuleiro getTabuleiro() {
+        return tabuleiro;
+    }
+    protected void setTabuleiro(Tabuleiro tabuleiro) {
         this.tabuleiro = tabuleiro;
     }
 
+    protected void setPecaBranca(boolean pecaBranca) {
+        this.pecaBranca = pecaBranca;
+    }
     public boolean isPecaBranca() {
-        return this.pecaBranca;
+        return pecaBranca;
+    }
+
+
+    protected void setNome(String nome) {
+        this.nome = nome;
     }
     public String getNome() {
         return this.nome;
     }
-    public abstract boolean isMovimentoValido(int lin, int col, int linDestino, int colDestino);
+
+    public abstract boolean[][] isMovimentoValido(int lin, int col);
 }
 

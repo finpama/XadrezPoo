@@ -6,14 +6,42 @@ import Xadrez.Tabuleiro;
 
 public class Torre extends Peca {
     public Torre(Tabuleiro tabuleiro, boolean pecaBranca) {
-        super(tabuleiro);
-        this.pecaBranca = pecaBranca;
-        this.nome = "T";
+        super(tabuleiro, pecaBranca);
+        setNome("T");
     }
 
     @Override
-    public boolean isMovimentoValido(int lin, int col, int linDestino, int colDestino) {
-        return false;
+    public boolean[][] isMovimentoValido(int lin, int col){
+        boolean[][] matriz = new boolean[8][8];
+        Peca[][] posicoes = tabuleiro.getMatrizPosicoes();
+
+        //Movimentação da torre
+        int[][] direcoes = {
+                {-1, 0}, //Cima
+                {0, -1},//Esquerda
+                {1, 0}, //Baixo
+                {0, 1}, //Direita
+        };
+
+        for(int[] dir: direcoes){
+            int i = lin + dir[0];
+            int j = col + dir[1];
+
+            while (i >= 0 && i < 8 && j >= 0 && j < 8){
+                if (posicoes[i][j] == null){
+                    matriz[i][j] = true;
+                } else{
+                    if (posicoes[i][j].isPecaBranca() != this.pecaBranca){
+                        matriz[i][j] = true;
+                    }
+                    break;
+                }
+                i += dir[0];
+                j += dir[1];
+            }
+        }
+        return matriz;
     }
+
 }
 

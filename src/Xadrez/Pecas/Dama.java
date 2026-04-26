@@ -5,13 +5,45 @@ import Xadrez.Tabuleiro;
 
 public class Dama extends Peca {
     public Dama(Tabuleiro tabuleiro, boolean pecaBranca) {
-        super(tabuleiro);
-        this.pecaBranca = pecaBranca;
-        this.nome = "D";
+        super(tabuleiro, pecaBranca);
+        setNome("D");
     }
 
     @Override
-    public boolean isMovimentoValido(int lin, int col, int linDestino, int colDestino) {
-        return false;
+    public boolean[][] isMovimentoValido(int lin, int col) {
+        boolean[][] matriz = new boolean[8][8];
+        Peca[][] posicoes = tabuleiro.getMatrizPosicoes();
+
+        //A movimentação da rainha
+        int[][] direcoes = {
+                {-1, -1}, //Noroeste
+                {-1, 1}, //Nordeste
+                {1, 1}, //Sudeste
+                {1, -1}, //Sudoeste
+                {-1, 0}, //Cima
+                {0, -1},//Esquerda
+                {1, 0}, //Baixo
+                {0, 1}, //Direita
+        };
+
+        for (int[] dir : direcoes) {
+            int i = lin + dir[0];
+            int j = col + dir[1];
+
+            while (i >= 0 && i < 8 && j >= 0 && j < 8) {
+                if (posicoes[i][j] == null) {
+                    matriz[i][j] = true;
+                } else {
+                    if (posicoes[i][j].isPecaBranca() != this.pecaBranca) {
+                        matriz[i][j] = true;
+                    }
+                    break;
+                }
+                i += dir[0];
+                j += dir[1];
+            }
+        }
+        return matriz;
     }
+
 }
