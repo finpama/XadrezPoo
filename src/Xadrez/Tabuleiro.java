@@ -9,6 +9,11 @@ public class Tabuleiro {
     private boolean isVezBrancas;
     private int numRodadas;
     private String vencedor = "";
+    private String avisoXeque = "";
+
+    public String getAvisoXeque() {
+        return avisoXeque;
+    }
 
     public String getVencedor() {
         return vencedor;
@@ -77,7 +82,10 @@ public class Tabuleiro {
         // Standard ANSI Escape Codes
         final String RESET = "\u001B[0m";
         final String GRAY = "\u001B[90m";
+        final String RED = "\u001B[31;1m";
 
+        System.out.println("  " + RED + getAvisoXeque() + RESET
+        );
         System.out.println("  ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐");
 
         for (int i = 0; i < matrizPosicoes.length; i++) {
@@ -179,7 +187,7 @@ public class Tabuleiro {
 
 
     private Peca checaPromocao(Peca peca, int lin) {
-        if (peca.getNome().equals("P") && (lin == 8 || lin == 1)) {
+        if (peca.getNome().equals("P") && (lin == 7 || lin == 0)) {
             return new Dama(this, peca.isPecaBranca());
         } else {
             return peca;
@@ -188,43 +196,41 @@ public class Tabuleiro {
 
     private void checaCapturaRei(int  colFinal, int linFinal) {
         boolean campoNaoVazio = matrizPosicoes[linFinal][colFinal] != null;
-        boolean pecaCapturadaIsRei = matrizPosicoes[linFinal][colFinal].getNome().equals("R");
 
-        if (campoNaoVazio && pecaCapturadaIsRei) {
-            if (isVezBrancas()) {
-                vencedor = "Brancas";
-            } else {
-                vencedor = "Pretas";
+        if (campoNaoVazio) {
+            boolean pecaCapturadaIsRei = matrizPosicoes[linFinal][colFinal].getNome().equals("R");
+
+            if (pecaCapturadaIsRei){
+                if (isVezBrancas()) {
+                    vencedor = "Brancas";
+                } else {
+                    vencedor = "Pretas";
+                }
             }
         }
     }
 
-    public String moverPeca(String notacao) { // Retorna o resultado do movimento
-        String letraPeca = notacao.substring(0, 1).toUpperCase();
-
-        String str_colInicial = notacao.substring(1, 2);
-        String str_colFinal = notacao.substring(4, 5);
-        String str_linInicial = notacao.substring(2, 3);
-        String str_linFinal = notacao.substring(5);
+    public String moverPeca(String str_colInicial, String str_linInicial, String str_colFinal, String str_linFinal) { // Retorna o resultado do movimento
 
         int colInicial = letraParaIndex(str_colInicial);
-        int linInicial = Math.abs(Integer.parseInt(str_linInicial) - 8); // inverte a direção da linha para ir de 8 a 1
+
+        int linInicial = Math.abs(Integer.parseInt(str_linInicial) - 8) ; // inverte a direção da linha para ir de 8 a 1
+        //if (linInicial < 0) { linInicial--; }
 
         int colFinal = letraParaIndex(str_colFinal);
+
         int linFinal = Math.abs(Integer.parseInt(str_linFinal) - 8); // inverte a direção da linha para ir de 8 a 1
+        //if (linFinal < 0) { linFinal--; }
 
 
-        String notacaoCorrigida = letraPeca + str_colInicial + str_linInicial + "-" + str_colFinal + str_linFinal;
+        String notacaoCorrigida = str_colInicial + str_linInicial + "-" + str_colFinal + str_linFinal;
 
         //checar peça
 
         try {
             Peca peca = matrizPosicoes[linInicial][colInicial];
 
-            if (!peca.getNome().equals(letraPeca)) {
-                return "(%s) A peça %s não se encontra na posição especificada.".formatted(notacaoCorrigida, letraParaPeca(letraPeca));
-
-            } else if (peca.isPecaBranca() != isVezBrancas()) {
+            if (peca.isPecaBranca() != isVezBrancas()) {
                 return "(%s) Não é possível mover uma peça rival.".formatted(notacaoCorrigida);
 
             } else {
@@ -238,29 +244,31 @@ public class Tabuleiro {
                     matrizPosicoes[linInicial][colInicial] = null;
 
                     // Verifica se após o movimento está ocorrendo um cheque
-                    String avisoXeque = "";
                     if (emXeque(!isVezBrancas())) {
 
                         String cor;
                         if (isVezBrancas()) {
-                            cor = "branco";
-                        } else  {
                             cor = "preto";
+                        } else  {
+                            cor = "branco";
                         }
 
-                        avisoXeque = ".\\x1b[1;31m O rei %s está em Xeque!\\x1b[0".formatted(cor);
+                        this.avisoXeque = " O rei %s está em Xeque!".formatted(cor);
+
+                    } else {
+                        this.avisoXeque = "";
                     }
 
                     proxRodada();
-                    return "(%s) %s foi movido(a) para %s%s%s".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colFinal, str_linFinal, avisoXeque);
+                    return "(%s) %s foi movido(a) para %s%s.".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colFinal, str_linFinal);
 
                 } else {
-                    return "(%s) Não é permitido mover a peça %s em %s%s para %s%s".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colInicial, str_linInicial, str_colFinal, str_linFinal);
+                    return "(%s) Não é permitido mover a peça %s em %s%s para %s%s.".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colInicial, str_linInicial, str_colFinal, str_linFinal);
                 }
             }
 
         } catch (NullPointerException e) {
-            return "(%s) A peça %s não se encontra na posição especificada.".formatted(notacaoCorrigida, letraParaPeca(letraPeca));
+            return "(%s) Não existe peça na posição especificada.".formatted(notacaoCorrigida);
         }
 
 

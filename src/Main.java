@@ -21,7 +21,7 @@ public class Main {
         limpaTela();
         System.out.println("  --------------------  Xadrez  -------------------\n");
         System.out.println("Instruções:");
-        System.out.println(" - Para mover uma peça diga a inicial, a posição onde está, '-' e a posição para onde irá. Ex: Cb2-c3 (Cavalo em b2 para c3).");
+        System.out.println(" - Para mover uma peça diga a coluna e linha onde ela está, '-' e a posição para onde irá. Ex: b2-c3 (Cavalo em b2 para c3).");
         System.out.println(" - Caso exista uma peça do oponente no destino indicado, haverá uma captura.");
         System.out.println("\nIniciais (em português)");
         System.out.println("B - Bispo");
@@ -54,11 +54,11 @@ public class Main {
                 break;
             }
 
-            Pattern formatoNotacao = Pattern.compile("([BCDPRT][a-h][1-8]\\-[a-h][1-8])", Pattern.CASE_INSENSITIVE);
+            Pattern formatoNotacao = Pattern.compile("([a-h])([1-8])\\-([a-h])([1-8])", Pattern.CASE_INSENSITIVE);
             Matcher notacao = formatoNotacao.matcher(resposta);
 
             if (notacao.find()) {
-                resultadoAnterior = tabuleiro.moverPeca(notacao.group());
+                resultadoAnterior = tabuleiro.moverPeca(notacao.group(1), notacao.group(2), notacao.group(3), notacao.group(4));
 
             } else {
                 resultadoAnterior = "O movimento não foi escrito na notação correta";
@@ -70,9 +70,9 @@ public class Main {
 
         }
 
-        System.out.println("Jogo finalizado...");
+        System.out.println("\nJogo finalizado...");
         if (!tabuleiro.getVencedor().isEmpty()) {
-            System.out.printf("As %s venceram!!!!!%n", tabuleiro.getVencedor());
+            System.out.printf("\u001B[32;1mAs %s venceram!!!!!\u001B[0m", tabuleiro.getVencedor()); // Imprime a mensagem em verde
         }
 
     }
