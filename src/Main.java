@@ -12,7 +12,7 @@ public class Main {
         for (int i = 0; i < 50; ++i) System.out.println();
     }
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         Tabuleiro tabuleiro = new Tabuleiro();
         Scanner scanner = new Scanner(System.in);
         String resultadoAnterior = "Primeira rodada";

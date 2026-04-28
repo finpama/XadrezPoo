@@ -33,7 +33,7 @@ public class Peao extends Peca {
             }
             int[] colCaptura = {col-1, col+1};
             for (int j: colCaptura) {
-                if (j >= 0 && j < 8){
+                if (i>= 0 && i < 8 && j >= 0 && j< 8){
                     Peca alvo = posicoes[i][j];
                     if (alvo != null && alvo.isPecaBranca() != this.pecaBranca){
                         matriz[i][j] = true;

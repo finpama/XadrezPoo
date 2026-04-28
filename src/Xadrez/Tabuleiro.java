@@ -144,6 +144,61 @@ public class Tabuleiro {
         };
     }
 
+
+    // xeque
+    private int[] achaRei(boolean isReiBranco) {
+        for (int i= 0; i<8; i++) {
+            for (int j= 0; j<8; j++) {
+                Peca peca = matrizPosicoes[i][j];
+                if (peca != null && peca.getNome().equals("R") && peca.isPecaBranca() == isReiBranco) {
+                    return new int[]{i,j};
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean emXeque(boolean isReiBranco) {
+        int[] posRei = achaRei(isReiBranco);
+        if (posRei == null){
+            return false;
+        }
+        for (int i= 0; i <8; i++) {
+            for (int j= 0; j<8; j++) {
+                Peca peca = matrizPosicoes[i][j];
+                if (peca != null && peca.isPecaBranca() != isReiBranco) {
+                    boolean[][] movInimigo = peca.isMovimentoValido(i, j);
+                    if (movInimigo[posRei[0]][posRei[1]]){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private Peca checaPromocao(Peca peca, int lin) {
+        if (peca.getNome().equals("P") && (lin == 8 || lin == 1)) {
+            return new Dama(this, peca.isPecaBranca());
+        } else {
+            return peca;
+        }
+    }
+
+    private void checaCapturaRei(int  colFinal, int linFinal) {
+        boolean campoNaoVazio = matrizPosicoes[linFinal][colFinal] != null;
+        boolean pecaCapturadaIsRei = matrizPosicoes[linFinal][colFinal].getNome().equals("R");
+
+        if (campoNaoVazio && pecaCapturadaIsRei) {
+            if (isVezBrancas()) {
+                vencedor = "Brancas";
+            } else {
+                vencedor = "Pretas";
+            }
+        }
+    }
+
     public String moverPeca(String notacao) { // Retorna o resultado do movimento
         String letraPeca = notacao.substring(0, 1).toUpperCase();
 
@@ -176,22 +231,28 @@ public class Tabuleiro {
                 boolean[][] posicoesPossiveis = peca.isMovimentoValido(linInicial, colInicial);
 
                 if (posicoesPossiveis[linFinal][colFinal]) { // se o movimento para essas coordenadas for possível move a peça
-
-                    if (matrizPosicoes[linFinal][colFinal] != null) {
-                        if (matrizPosicoes[linFinal][colFinal].getNome().equals("R")) {
-                            if (isVezBrancas()) {
-                                vencedor = "Brancas";
-                            } else {
-                                vencedor = "Pretas";
-                            }
-                        }
-                    }
+                    peca = checaPromocao(peca, linFinal);
+                    checaCapturaRei(colFinal, linFinal);
 
                     matrizPosicoes[linFinal][colFinal] = peca;
                     matrizPosicoes[linInicial][colInicial] = null;
 
+                    // Verifica se após o movimento está ocorrendo um cheque
+                    String avisoXeque = "";
+                    if (emXeque(!isVezBrancas())) {
+
+                        String cor;
+                        if (isVezBrancas()) {
+                            cor = "branco";
+                        } else  {
+                            cor = "preto";
+                        }
+
+                        avisoXeque = ".\\x1b[1;31m O rei %s está em Xeque!\\x1b[0".formatted(cor);
+                    }
+
                     proxRodada();
-                    return "(%s) %s foi movido(a) para %s%s".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colFinal, str_linFinal);
+                    return "(%s) %s foi movido(a) para %s%s%s".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colFinal, str_linFinal, avisoXeque);
 
                 } else {
                     return "(%s) Não é permitido mover a peça %s em %s%s para %s%s".formatted(notacaoCorrigida, letraParaPeca(peca.getNome()), str_colInicial, str_linInicial, str_colFinal, str_linFinal);
